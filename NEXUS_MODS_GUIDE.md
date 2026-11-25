@@ -6,7 +6,7 @@ Tu archivo listo para subir a Nexus Mods ya está empaquetado aquí:
 ---
 
 ## Paso 1: Crear la página del mod en Nexus Mods
-1. Entra en **https://www.nexusmods.com/eiyudenchroniclehundredheroes** e inicia sesión con tu cuenta.
+1. Entra en **https://www.nexusmods.com/eiyudenchronicle/mods/31** (tu página del mod ya publicada) para gestionar archivos o actualizaciones.
 2. Haz clic en **Mods → Upload a Mod** (arriba a la derecha).
 3. Rellena los campos básicos:
    - **Mod name**: `EiyudenKBM - Full Keyboard & Mouse Support + Rebinding`

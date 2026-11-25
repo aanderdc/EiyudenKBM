@@ -1,7 +1,11 @@
 # EiyudenKBM — Keyboard & Mouse Mod for Eiyuden Chronicle: Hundred Heroes
 
+[![Nexus Mods](https://img.shields.io/badge/Nexus%20Mods-Download-orange)](https://www.nexusmods.com/eiyudenchronicle/mods/31)
+[![GitHub Release](https://img.shields.io/github/v/release/aanderdc/EiyudenKBM)](https://github.com/aanderdc/EiyudenKBM/releases/latest)
+
 A **BepInEx 6 (Unity IL2CPP)** mod that adds native, ergonomic **Keyboard & Mouse** support, full in-game key/mouse rebinding (including **Mouse4 / Mouse5** side buttons), dynamic keycap & mouse button prompts, and seamless KBM ↔ Gamepad switching for **Eiyuden Chronicle: Hundred Heroes** (Steam / PC).
 
+> **Download:** [Nexus Mods](https://www.nexusmods.com/eiyudenchronicle/mods/31) · [GitHub Releases](https://github.com/aanderdc/EiyudenKBM/releases)
 > **Zero game files modified or redistributed.** Everything lives cleanly inside `BepInEx/plugins` and `BepInEx/config`, with an automatic **Safe Mode** watchdog.
 
 ---
