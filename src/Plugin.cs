@@ -13,7 +13,7 @@ namespace EiyudenKBM
     {
         public const string PLUGIN_GUID = "com.personal.eiyuden.kbm";
         public const string PLUGIN_NAME = "EiyudenKBM";
-        public const string PLUGIN_VERSION = "1.0.0";
+        public const string PLUGIN_VERSION = "1.0.1";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]

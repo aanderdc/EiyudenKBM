@@ -22,6 +22,7 @@ namespace EiyudenKBM
 
         // 00_General
         public ConfigEntry<bool> Enabled { get; }
+        public ConfigEntry<ModLanguage> Language { get; }
         public ConfigEntry<bool> ResetSafeMode { get; }
         public ConfigEntry<bool> VerboseLogging { get; }
         public ConfigEntry<bool> KeepOriginalBindings { get; }
@@ -100,7 +101,9 @@ namespace EiyudenKBM
 
             // 00_General
             Enabled = cfg.Bind("00_General", "Enabled", true,
-                "Interruptor general del mod (true = activado, false = desactivado por completo).");
+                "Master on/off toggle / Interruptor general del mod (true = enabled, false = disabled).");
+            Language = cfg.Bind("00_General", "Language", ModLanguage.Auto,
+                "Mod UI language / Idioma de la interfaz del mod: Auto, English, Spanish.");
             ResetSafeMode = cfg.Bind("00_General", "ResetSafeMode", false,
                 "Ponlo en true una vez si quieres salir del Modo Seguro tras un crash previo (se restablece solo a false).");
             VerboseLogging = cfg.Bind("00_General", "VerboseLogging", false,

@@ -264,22 +264,22 @@ namespace EiyudenKBM
             string t = token.Trim();
             return t.ToLowerInvariant() switch
             {
-                "mouseleft" or "lmb" or "mouse0" => "Clic Izq (LMB)",
-                "mouseright" or "rmb" or "mouse1" => "Clic Der (RMB)",
-                "mousemiddle" or "mmb" or "mouse2" => "Clic Central (MMB)",
-                "mouse4" or "mouseback" or "mb4" => "Ratón 4 (Atrás)",
-                "mouse5" or "mouseforward" or "mb5" => "Ratón 5 (Adelante)",
-                "space" => "Espacio",
+                "mouseleft" or "lmb" or "mouse0" => Loc.T("Left Click (LMB)", "Clic Izq (LMB)"),
+                "mouseright" or "rmb" or "mouse1" => Loc.T("Right Click (RMB)", "Clic Der (RMB)"),
+                "mousemiddle" or "mmb" or "mouse2" => Loc.T("Middle Click (MMB)", "Clic Central (MMB)"),
+                "mouse4" or "mouseback" or "mb4" => Loc.T("Mouse 4 (Back)", "Ratón 4 (Atrás)"),
+                "mouse5" or "mouseforward" or "mb5" => Loc.T("Mouse 5 (Forward)", "Ratón 5 (Adelante)"),
+                "space" => Loc.T("Space", "Espacio"),
                 "escape" or "esc" => "Esc",
-                "leftshift" or "lshift" => "Shift Izq",
-                "rightshift" or "rshift" => "Shift Der",
-                "leftctrl" or "lctrl" => "Ctrl Izq",
-                "rightctrl" or "rctrl" => "Ctrl Der",
-                "leftalt" or "lalt" => "Alt Izq",
-                "rightalt" or "ralt" => "Alt Der",
-                "backspace" => "Retroceso",
-                "pageup" => "RePág",
-                "pagedown" => "AvPág",
+                "leftshift" or "lshift" => Loc.T("Left Shift", "Shift Izq"),
+                "rightshift" or "rshift" => Loc.T("Right Shift", "Shift Der"),
+                "leftctrl" or "lctrl" => Loc.T("Left Ctrl", "Ctrl Izq"),
+                "rightctrl" or "rctrl" => Loc.T("Right Ctrl", "Ctrl Der"),
+                "leftalt" or "lalt" => Loc.T("Left Alt", "Alt Izq"),
+                "rightalt" or "ralt" => Loc.T("Right Alt", "Alt Der"),
+                "backspace" => Loc.T("Backspace", "Retroceso"),
+                "pageup" => Loc.T("Page Up", "RePág"),
+                "pagedown" => Loc.T("Page Down", "AvPág"),
                 _ => t.StartsWith("Digit", StringComparison.OrdinalIgnoreCase) && t.Length == 6 ? t.Substring(5) : t
             };
         }
@@ -287,7 +287,7 @@ namespace EiyudenKBM
         public static string FormatBindingList(string raw)
         {
             var tokens = ModConfig.ParseTokens(raw);
-            if (tokens.Count == 0) return "(Sin asignar)";
+            if (tokens.Count == 0) return Loc.T("(Unbound)", "(Sin asignar)");
             var labels = new List<string>(tokens.Count);
             for (int i = 0; i < tokens.Count; i++)
                 labels.Add(GetDisplayLabel(tokens[i]));

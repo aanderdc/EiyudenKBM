@@ -7,8 +7,9 @@ using UnityEngine.InputSystem;
 namespace EiyudenKBM
 {
     /// <summary>
-    /// In-game Settings & Key/Mouse Rebinding Panel:
-    /// - Accessible directly from Ajustes / Opciones -> "Controles (Teclado y Ratón)" AND via F8 (configurable).
+    /// In-game bilingual (English / Spanish) Settings & Key/Mouse Rebinding Panel:
+    /// - Accessible directly from Options -> "Keyboard & Mouse Controls" / "Controles (Teclado y Ratón)" AND via F8.
+    /// - Live EN / ES language selector button right in the header bar.
     /// - Supports capturing ANY Keyboard key AND ALL 5 Mouse buttons (MouseLeft, MouseRight, MouseMiddle, Mouse4, Mouse5).
     /// - Uses explicit Rect-based IMGUI calls (zero GUILayoutOption IL2CPP marshalling quirks) with dark-gold styling.
     /// - Saves live into BepInEx/config/EiyudenKBM.cfg immediately.
@@ -53,10 +54,15 @@ namespace EiyudenKBM
 
         private sealed class BindingRow
         {
-            public string Section;
-            public string Label;
+            public string SectionEn;
+            public string SectionEs;
+            public string LabelEn;
+            public string LabelEs;
             public ConfigEntry<string> Entry;
             public bool SingleValueOnly;
+
+            public string Section => Loc.T(SectionEn, SectionEs);
+            public string Label => Loc.T(LabelEn, LabelEs);
         }
 
         private static List<BindingRow> _rows;
@@ -69,7 +75,9 @@ namespace EiyudenKBM
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             EnsureRows();
-            ShowStatus("Haz clic en [Cambiar] o [+Añadir] y pulsa cualquier tecla o botón del ratón (incl. Mouse4 / Mouse5).");
+            ShowStatus(Loc.T(
+                "Click [Change] or [+Add] and press any key or mouse button (incl. Mouse4 / Mouse5).",
+                "Haz clic en [Cambiar] o [+Añadir] y pulsa cualquier tecla o botón del ratón (incl. Mouse4 / Mouse5)."));
         }
 
         public static void Close()
@@ -104,29 +112,28 @@ namespace EiyudenKBM
             // Handle active key/mouse capture
             if (_capturingEntry != null)
             {
-                // Skip the frame we clicked the button so the button click itself isn't captured
                 if (Time.frameCount <= _captureStartFrame + 1)
                     return;
 
-                // ESC cancels capture
                 var kb = Keyboard.current;
                 if (kb != null && kb.escapeKey.wasPressedThisFrame)
                 {
                     _capturingEntry = null;
-                    ShowStatus("Captura cancelada.");
+                    ShowStatus(Loc.T("Capture cancelled.", "Captura cancelada."));
                     return;
                 }
 
                 if (KeyBindingSystem.TryCapturePressedInput(out string captured, allowMouseButtons: true, allowMouseLeft: _captureAllowMouseLeft))
                 {
                     ApplyCapturedToken(_capturingEntry, captured, _captureAppendMode);
-                    ShowStatus($"'{_capturingLabel}' actualizado -> {KeyBindingSystem.FormatBindingList(_capturingEntry.Value)}");
+                    ShowStatus(Loc.T(
+                        $"'{_capturingLabel}' updated -> {KeyBindingSystem.FormatBindingList(_capturingEntry.Value)}",
+                        $"'{_capturingLabel}' actualizado -> {KeyBindingSystem.FormatBindingList(_capturingEntry.Value)}"));
                     _capturingEntry = null;
                 }
                 return;
             }
 
-            // ESC closes the panel when not capturing
             var keyboard = Keyboard.current;
             if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame)
             {
@@ -171,34 +178,34 @@ namespace EiyudenKBM
             var s = Plugin.Settings;
             _rows = new List<BindingRow>
             {
-                // Exploración
-                new() { Section = "EXPLORACIÓN", Label = "Interactuar / Hablar / Examinar", Entry = s.Interact },
-                new() { Section = "EXPLORACIÓN", Label = "Caminar / Correr (mantener)", Entry = s.WalkToggleHold },
-                new() { Section = "EXPLORACIÓN", Label = "Menú Principal (Inventario/Equipo)", Entry = s.MainMenu },
-                new() { Section = "EXPLORACIÓN", Label = "Menú de Pausa / Sistema", Entry = s.PauseSystemMenu },
-                new() { Section = "EXPLORACIÓN", Label = "Abrir Mapa", Entry = s.WorldMap },
+                // Exploration
+                new() { SectionEn = "EXPLORATION", SectionEs = "EXPLORACIÓN", LabelEn = "Interact / Talk / Examine", LabelEs = "Interactuar / Hablar / Examinar", Entry = s.Interact },
+                new() { SectionEn = "EXPLORATION", SectionEs = "EXPLORACIÓN", LabelEn = "Walk / Run Toggle (Hold)", LabelEs = "Caminar / Correr (mantener)", Entry = s.WalkToggleHold },
+                new() { SectionEn = "EXPLORATION", SectionEs = "EXPLORACIÓN", LabelEn = "Main Menu (Inventory / Party)", LabelEs = "Menú Principal (Inventario/Equipo)", Entry = s.MainMenu },
+                new() { SectionEn = "EXPLORATION", SectionEs = "EXPLORACIÓN", LabelEn = "Pause / System Menu", LabelEs = "Menú de Pausa / Sistema", Entry = s.PauseSystemMenu },
+                new() { SectionEn = "EXPLORATION", SectionEs = "EXPLORACIÓN", LabelEn = "Open Map", LabelEs = "Abrir Mapa", Entry = s.WorldMap },
 
-                // Cámara
-                new() { Section = "CÁMARA (EXPLORACIÓN)", Label = "Botón arrastrar cámara con ratón", Entry = s.MouseDragCameraButton, SingleValueOnly = true },
-                new() { Section = "CÁMARA (EXPLORACIÓN)", Label = "Girar cámara izquierda (tecla)", Entry = s.FieldCameraLeftKey, SingleValueOnly = true },
-                new() { Section = "CÁMARA (EXPLORACIÓN)", Label = "Girar cámara derecha (tecla)", Entry = s.FieldCameraRightKey, SingleValueOnly = true },
+                // Camera
+                new() { SectionEn = "CAMERA (EXPLORATION)", SectionEs = "CÁMARA (EXPLORACIÓN)", LabelEn = "Mouse Drag Camera Button", LabelEs = "Botón arrastrar cámara con ratón", Entry = s.MouseDragCameraButton, SingleValueOnly = true },
+                new() { SectionEn = "CAMERA (EXPLORATION)", SectionEs = "CÁMARA (EXPLORACIÓN)", LabelEn = "Rotate Camera Left (Key)", LabelEs = "Girar cámara izquierda (tecla)", Entry = s.FieldCameraLeftKey, SingleValueOnly = true },
+                new() { SectionEn = "CAMERA (EXPLORATION)", SectionEs = "CÁMARA (EXPLORACIÓN)", LabelEn = "Rotate Camera Right (Key)", LabelEs = "Girar cámara derecha (tecla)", Entry = s.FieldCameraRightKey, SingleValueOnly = true },
 
-                // Menús y Combate
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Confirmar / Aceptar", Entry = s.Confirm },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Cancelar / Atrás", Entry = s.Cancel },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Pestaña / Personaje anterior (LB)", Entry = s.TabPrevLB },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Pestaña / Personaje siguiente (RB)", Entry = s.TabNextRB },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Sección carrusel anterior (LT)", Entry = s.SectionPrevLT },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Sección carrusel siguiente (RT)", Entry = s.SectionNextRT },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Auto-equipar / Acción X", Entry = s.AuxActionX },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Detalles / Cambiar vista (Y)", Entry = s.DetailsViewY },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Ordenar / Filtrar (L3)", Entry = s.SortFilterLS },
-                new() { Section = "MENÚS, LISTAS Y COMBATE", Label = "Acción auxiliar / Máx. (R3)", Entry = s.SecondaryActionRS },
+                // Menus & Battle
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Confirm / Accept", LabelEs = "Confirmar / Aceptar", Entry = s.Confirm },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Cancel / Back", LabelEs = "Cancelar / Atrás", Entry = s.Cancel },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Previous Tab / Character (LB)", LabelEs = "Pestaña / Personaje anterior (LB)", Entry = s.TabPrevLB },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Next Tab / Character (RB)", LabelEs = "Pestaña / Personaje siguiente (RB)", Entry = s.TabNextRB },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Previous Carousel Section (LT)", LabelEs = "Sección carrusel anterior (LT)", Entry = s.SectionPrevLT },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Next Carousel Section (RT)", LabelEs = "Sección carrusel siguiente (RT)", Entry = s.SectionNextRT },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Auto-Equip / Aux Action (X)", LabelEs = "Auto-equipar / Acción X", Entry = s.AuxActionX },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Details / Switch View (Y)", LabelEs = "Detalles / Cambiar vista (Y)", Entry = s.DetailsViewY },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Sort / Filter (L3)", LabelEs = "Ordenar / Filtrar (L3)", Entry = s.SortFilterLS },
+                new() { SectionEn = "MENUS, LISTS & BATTLE", SectionEs = "MENÚS, LISTAS Y COMBATE", LabelEn = "Secondary / Max Qty (R3)", LabelEs = "Acción auxiliar / Máx. (R3)", Entry = s.SecondaryActionRS },
 
-                // Diálogos y panel
-                new() { Section = "DIÁLOGOS Y ATALAYA DEL MOD", Label = "Avanzar / Completar texto", Entry = s.DialogAdvance },
-                new() { Section = "DIÁLOGOS Y ATALAYA DEL MOD", Label = "Saltar cinemática (mantener)", Entry = s.DialogSkipHold },
-                new() { Section = "DIÁLOGOS Y ATALAYA DEL MOD", Label = "Abrir este panel de controles", Entry = s.RebindMenuKey, SingleValueOnly = true },
+                // Dialogs & Mod
+                new() { SectionEn = "DIALOGUES & MOD MENU", SectionEs = "DIÁLOGOS Y PANEL DEL MOD", LabelEn = "Advance / Complete Text", LabelEs = "Avanzar / Completar texto", Entry = s.DialogAdvance },
+                new() { SectionEn = "DIALOGUES & MOD MENU", SectionEs = "DIÁLOGOS Y PANEL DEL MOD", LabelEn = "Skip Cutscene (Hold)", LabelEs = "Saltar cinemática (mantener)", Entry = s.DialogSkipHold },
+                new() { SectionEn = "DIALOGUES & MOD MENU", SectionEs = "DIÁLOGOS Y PANEL DEL MOD", LabelEn = "Toggle This Settings Panel", LabelEs = "Abrir este panel de controles", Entry = s.RebindMenuKey, SingleValueOnly = true },
             };
         }
 
@@ -214,7 +221,6 @@ namespace EiyudenKBM
                 float sw = Screen.width;
                 float sh = Screen.height;
 
-                // Fullscreen dim background
                 GUI.DrawTexture(new Rect(0, 0, sw, sh), _texBgDim);
 
                 float panelW = Mathf.Clamp(sw * 0.78f, 760f, 1140f);
@@ -222,36 +228,52 @@ namespace EiyudenKBM
                 float px = (sw - panelW) * 0.5f;
                 float py = (sh - panelH) * 0.5f;
 
-                // Border + main panel
                 GUI.DrawTexture(new Rect(px - 2, py - 2, panelW + 4, panelH + 4), _texBorder);
                 GUI.DrawTexture(new Rect(px, py, panelW, panelH), _texPanelBg);
 
-                // Header bar
+                // Header bar with quick EN / ES language switcher
                 float headerH = 54f;
                 GUI.DrawTexture(new Rect(px, py, panelW, headerH), _texHeaderBg);
-                GUI.Label(new Rect(px + 20, py + 10, panelW - 220, 34),
-                    $"EiyudenKBM v{PluginInfo.PLUGIN_VERSION} — Ajustes de Teclado y Ratón", _titleStyle);
+                GUI.Label(new Rect(px + 20, py + 10, panelW - 380, 34),
+                    $"EiyudenKBM v{PluginInfo.PLUGIN_VERSION} — {Loc.T("Keyboard & Mouse Settings", "Ajustes de Teclado y Ratón")}",
+                    _titleStyle);
 
-                if (GUI.Button(new Rect(px + panelW - 175, py + 11, 155, 32), "Guardar y Cerrar (ESC)", _btnAccentStyle))
+                // Quick Language Switch button (cycles English <-> Spanish immediately!)
+                string langBtnText = Loc.IsSpanish ? "Idioma: Español [EN]" : "Language: English [ES]";
+                if (GUI.Button(new Rect(px + panelW - 355, py + 11, 165, 32), langBtnText, _btnStyle))
+                {
+                    Plugin.Settings.Language.Value = Loc.IsSpanish ? ModLanguage.English : ModLanguage.Spanish;
+                    Plugin.Settings.SaveAndNotify();
+                    ShowStatus(Loc.T("Language switched to English.", "Idioma cambiado a Español."));
+                }
+
+                if (GUI.Button(new Rect(px + panelW - 180, py + 11, 162, 32),
+                    Loc.T("Save & Close (ESC)", "Guardar y Cerrar (ESC)"), _btnAccentStyle))
                 {
                     Close();
                     return;
                 }
 
-                // Footer bar (fixed at bottom)
+                // Footer bar
                 float footerH = 54f;
                 float footerY = py + panelH - footerH;
                 GUI.DrawTexture(new Rect(px, footerY, panelW, footerH), _texHeaderBg);
 
                 string status = Time.unscaledTime < _statusUntilTime
                     ? _statusMessage
-                    : "Soporta teclado y ratón: Clic Izq, Clic Der, Clic Central, Ratón 4 (Atrás) y Ratón 5 (Adelante).";
+                    : Loc.T(
+                        "Supports keyboard & mouse: Left Click, Right Click, Middle Click, Mouse4 (Back), Mouse5 (Forward).",
+                        "Soporta teclado y ratón: Clic Izq, Clic Der, Clic Central, Ratón 4 (Atrás) y Ratón 5 (Adelante).");
                 GUI.Label(new Rect(px + 20, footerY + 14, panelW - 260, 26), status, _hintStyle);
 
-                if (GUI.Button(new Rect(px + panelW - 225, footerY + 11, 205, 32), "Restablecer por defecto", _btnStyle))
+                if (GUI.Button(new Rect(px + panelW - 225, footerY + 11, 205, 32),
+                    Loc.T("Reset to Defaults", "Restablecer por defecto"), _btnStyle))
                 {
+                    var prevLang = Plugin.Settings.Language.Value;
                     Plugin.Settings.ResetAllToDefaults();
-                    ShowStatus("Todos los controles han sido restablecidos a sus valores por defecto.");
+                    Plugin.Settings.Language.Value = prevLang;
+                    Plugin.Settings.SaveAndNotify();
+                    ShowStatus(Loc.T("All bindings reset to defaults.", "Todos los controles restablecidos por defecto."));
                 }
 
                 // Scrollable body
@@ -285,12 +307,14 @@ namespace EiyudenKBM
                     GUI.DrawTexture(new Rect(mx, my, mw, mh), _texPanelBg);
 
                     GUI.Label(new Rect(mx + 20, my + 20, mw - 40, 32),
-                        $"Asignando: {_capturingLabel}", _titleStyle);
+                        $"{Loc.T("Binding:", "Asignando:")} {_capturingLabel}", _titleStyle);
                     GUI.Label(new Rect(mx + 20, my + 62, mw - 40, 54),
-                        "Pulsa ahora cualquier tecla del teclado o botón del ratón\n" +
-                        "(Clic Izq, Clic Der, Clic Central, Botón lateral Mouse4 o Mouse5)...", _valueStyle);
+                        Loc.T(
+                            "Press any keyboard key or mouse button now\n(Left Click, Right Click, Middle Click, Mouse4 or Mouse5)...",
+                            "Pulsa ahora cualquier tecla del teclado o botón del ratón\n(Clic Izq, Clic Der, Clic Central, Botón lateral Mouse4 o Mouse5)..."),
+                        _valueStyle);
                     GUI.Label(new Rect(mx + 20, my + 132, mw - 40, 28),
-                        "Pulsa ESC para cancelar.", _hintStyle);
+                        Loc.T("Press ESC to cancel.", "Pulsa ESC para cancelar."), _hintStyle);
                 }
             }
             catch (Exception ex)
@@ -301,7 +325,7 @@ namespace EiyudenKBM
 
         private static float CalculateContentHeight()
         {
-            float h = 240f; // General + Cursor + Camera sliders
+            float h = 240f;
             string lastSec = null;
             for (int i = 0; i < _rows.Count; i++)
             {
@@ -318,53 +342,69 @@ namespace EiyudenKBM
         private static float DrawGeneralAndCursorSection(float w, float y)
         {
             var s = Plugin.Settings;
+            string yes = Loc.T("ON", "SÍ");
+            string no = Loc.T("OFF", "NO");
 
-            GUI.Label(new Rect(8, y, w - 16, 26), "GENERAL, CURSOR Y SENSIBILIDAD", _sectionStyle);
+            GUI.Label(new Rect(8, y, w - 16, 26),
+                Loc.T("GENERAL, CURSOR & SENSITIVITY", "GENERAL, CURSOR Y SENSIBILIDAD"), _sectionStyle);
             y += 30f;
 
             // Row 1: General toggles
             GUI.DrawTexture(new Rect(0, y, w, 34), _texRowBg);
-            if (GUI.Button(new Rect(10, y + 4, 210, 26), $"Mod activo: {(s.Enabled.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(10, y + 4, 210, 26),
+                $"{Loc.T("Mod Enabled", "Mod activo")}: {(s.Enabled.Value ? yes : no)}", _btnStyle))
             {
                 s.Enabled.Value = !s.Enabled.Value;
                 s.SaveAndNotify();
             }
-            if (GUI.Button(new Rect(230, y + 4, 250, 26), $"Mantener teclas originales: {(s.KeepOriginalBindings.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(230, y + 4, 250, 26),
+                $"{Loc.T("Keep Original Keys", "Mantener teclas originales")}: {(s.KeepOriginalBindings.Value ? yes : no)}", _btnStyle))
             {
                 s.KeepOriginalBindings.Value = !s.KeepOriginalBindings.Value;
                 s.SaveAndNotify();
             }
-            if (GUI.Button(new Rect(490, y + 4, 220, 26), $"Atajos 1-6 combate: {(s.BattleNumberShortcuts.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(490, y + 4, 225, 26),
+                $"{Loc.T("Battle 1-6 Shortcuts", "Atajos 1-6 combate")}: {(s.BattleNumberShortcuts.Value ? yes : no)}", _btnStyle))
             {
                 s.BattleNumberShortcuts.Value = !s.BattleNumberShortcuts.Value;
                 s.SaveAndNotify();
             }
             y += 38f;
 
-            // Row 2: Wheel toggles
+            // Row 2: Wheel toggles + Language selector
             GUI.DrawTexture(new Rect(0, y, w, 34), _texRowAltBg);
-            if (GUI.Button(new Rect(10, y + 4, 260, 26), $"Rueda desplaza listas: {(s.MouseWheelScrollLists.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(10, y + 4, 240, 26),
+                $"{Loc.T("Wheel Scrolls Lists", "Rueda desplaza listas")}: {(s.MouseWheelScrollLists.Value ? yes : no)}", _btnStyle))
             {
                 s.MouseWheelScrollLists.Value = !s.MouseWheelScrollLists.Value;
                 s.SaveAndNotify();
             }
-            if (GUI.Button(new Rect(280, y + 4, 280, 26), $"Shift + Rueda cambia pestañas: {(s.ShiftWheelSwitchTabs.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(260, y + 4, 250, 26),
+                $"{Loc.T("Shift + Wheel Tabs", "Shift + Rueda pestañas")}: {(s.ShiftWheelSwitchTabs.Value ? yes : no)}", _btnStyle))
             {
                 s.ShiftWheelSwitchTabs.Value = !s.ShiftWheelSwitchTabs.Value;
+                s.SaveAndNotify();
+            }
+            if (GUI.Button(new Rect(520, y + 4, 195, 26),
+                $"{Loc.T("Lang", "Idioma")}: {Loc.LanguageDisplayName(s.Language.Value)}", _btnStyle))
+            {
+                int next = ((int)s.Language.Value + 1) % 3;
+                s.Language.Value = (ModLanguage)next;
                 s.SaveAndNotify();
             }
             y += 38f;
 
             // Row 3: Cursor mode in exploration
             GUI.DrawTexture(new Rect(0, y, w, 34), _texRowBg);
-            GUI.Label(new Rect(12, y + 6, 250, 24), "Cursor en exploración:", _labelStyle);
+            GUI.Label(new Rect(12, y + 6, 250, 24),
+                Loc.T("Exploration Cursor Mode:", "Cursor en exploración:"), _labelStyle);
             string cursorLabel = s.FieldCursorMode.Value switch
             {
-                FieldCursorBehavior.AutoHideInField => "Auto-ocultar al caminar (Recomendado)",
-                FieldCursorBehavior.AlwaysHiddenInField => "Siempre oculto en exploración",
-                _ => "Siempre visible"
+                FieldCursorBehavior.AutoHideInField => Loc.T("Auto-hide while walking (Recommended)", "Auto-ocultar al caminar (Recomendado)"),
+                FieldCursorBehavior.AlwaysHiddenInField => Loc.T("Always hidden in field", "Siempre oculto en exploración"),
+                _ => Loc.T("Always visible", "Siempre visible")
             };
-            if (GUI.Button(new Rect(265, y + 4, 330, 26), cursorLabel, _btnStyle))
+            if (GUI.Button(new Rect(265, y + 4, 340, 26), cursorLabel, _btnStyle))
             {
                 int next = ((int)s.FieldCursorMode.Value + 1) % 3;
                 s.FieldCursorMode.Value = (FieldCursorBehavior)next;
@@ -374,7 +414,8 @@ namespace EiyudenKBM
 
             // Row 4: Mouse camera sensitivity
             GUI.DrawTexture(new Rect(0, y, w, 34), _texRowAltBg);
-            GUI.Label(new Rect(12, y + 6, 175, 24), $"Sensibilidad X: {s.MouseCameraSensitivityX.Value:0.00}", _labelStyle);
+            GUI.Label(new Rect(12, y + 6, 175, 24),
+                $"{Loc.T("Sensitivity X", "Sensibilidad X")}: {s.MouseCameraSensitivityX.Value:0.00}", _labelStyle);
             float newSx = GUI.HorizontalSlider(new Rect(190, y + 11, 160, 18), s.MouseCameraSensitivityX.Value, 0.2f, 3.0f);
             if (Mathf.Abs(newSx - s.MouseCameraSensitivityX.Value) > 0.01f)
             {
@@ -382,7 +423,8 @@ namespace EiyudenKBM
                 s.SaveAndNotify();
             }
 
-            GUI.Label(new Rect(375, y + 6, 175, 24), $"Sensibilidad Y: {s.MouseCameraSensitivityY.Value:0.00}", _labelStyle);
+            GUI.Label(new Rect(375, y + 6, 175, 24),
+                $"{Loc.T("Sensitivity Y", "Sensibilidad Y")}: {s.MouseCameraSensitivityY.Value:0.00}", _labelStyle);
             float newSy = GUI.HorizontalSlider(new Rect(550, y + 11, 160, 18), s.MouseCameraSensitivityY.Value, 0.2f, 3.0f);
             if (Mathf.Abs(newSy - s.MouseCameraSensitivityY.Value) > 0.01f)
             {
@@ -393,12 +435,14 @@ namespace EiyudenKBM
 
             // Row 5: Invert camera
             GUI.DrawTexture(new Rect(0, y, w, 34), _texRowBg);
-            if (GUI.Button(new Rect(10, y + 4, 210, 26), $"Invertir cámara X: {(s.InvertMouseCameraX.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(10, y + 4, 210, 26),
+                $"{Loc.T("Invert Camera X", "Invertir cámara X")}: {(s.InvertMouseCameraX.Value ? yes : no)}", _btnStyle))
             {
                 s.InvertMouseCameraX.Value = !s.InvertMouseCameraX.Value;
                 s.SaveAndNotify();
             }
-            if (GUI.Button(new Rect(230, y + 4, 210, 26), $"Invertir cámara Y: {(s.InvertMouseCameraY.Value ? "SÍ" : "NO")}", _btnStyle))
+            if (GUI.Button(new Rect(230, y + 4, 210, 26),
+                $"{Loc.T("Invert Camera Y", "Invertir cámara Y")}: {(s.InvertMouseCameraY.Value ? yes : no)}", _btnStyle))
             {
                 s.InvertMouseCameraY.Value = !s.InvertMouseCameraY.Value;
                 s.SaveAndNotify();
@@ -412,6 +456,10 @@ namespace EiyudenKBM
         {
             string currentSec = null;
             int rowIdx = 0;
+
+            string btnChange = Loc.T("Change", "Cambiar");
+            string btnAdd = Loc.T("+ Add", "+ Añadir");
+            string btnClear = Loc.T("Clear", "Quitar");
 
             for (int i = 0; i < _rows.Count; i++)
             {
@@ -435,7 +483,7 @@ namespace EiyudenKBM
                 GUI.Label(new Rect(valX, y + 6, valW, 24), KeyBindingSystem.FormatBindingList(row.Entry.Value), _valueStyle);
 
                 float bx = w - btnsW - 8f;
-                if (GUI.Button(new Rect(bx, y + 4, 86, 26), "Cambiar", _btnStyle))
+                if (GUI.Button(new Rect(bx, y + 4, 86, 26), btnChange, _btnStyle))
                 {
                     StartCapture(row.Entry, row.Label, append: false, allowMouseLeft: !row.SingleValueOnly || row.Entry == Plugin.Settings.MouseDragCameraButton);
                 }
@@ -443,18 +491,18 @@ namespace EiyudenKBM
 
                 if (!row.SingleValueOnly)
                 {
-                    if (GUI.Button(new Rect(bx, y + 4, 84, 26), "+ Añadir", _btnStyle))
+                    if (GUI.Button(new Rect(bx, y + 4, 84, 26), btnAdd, _btnStyle))
                     {
                         StartCapture(row.Entry, row.Label, append: true, allowMouseLeft: true);
                     }
                     bx += 90f;
                 }
 
-                if (GUI.Button(new Rect(bx, y + 4, 78, 26), "Quitar", _btnStyle))
+                if (GUI.Button(new Rect(bx, y + 4, 78, 26), btnClear, _btnStyle))
                 {
                     row.Entry.Value = "None";
                     Plugin.Settings.SaveAndNotify();
-                    ShowStatus($"'{row.Label}' dejado sin asignar.");
+                    ShowStatus(Loc.T($"'{row.Label}' cleared.", $"'{row.Label}' dejado sin asignar."));
                 }
 
                 y += 36f;

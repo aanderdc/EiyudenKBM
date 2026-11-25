@@ -258,9 +258,9 @@ namespace EiyudenKBM
                         var buttons = selector._buttonList;
                         if (buttons != null && buttons.Count == list.Count)
                         {
-                            selector.AddButton("Controles (Teclado y Ratón)", null, "system", "SE_sys_0000");
+                            selector.AddButton(Loc.OptionsMenuButtonText, null, "system", "SE_sys_0000");
                             InjectedOptionMenus.Add(id);
-                            Plugin.Logger?.LogInfo("[OptionMenu] Botón 'Controles (Teclado y Ratón)' añadido en Ajustes (index=" + list.Count + ").");
+                            Plugin.Logger?.LogInfo("[OptionMenu] Added KBM settings button: '" + Loc.OptionsMenuButtonText + "' (index=" + list.Count + ").");
                         }
                     }
                 }

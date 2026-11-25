@@ -1,5 +1,10 @@
 # Changelog — EiyudenKBM
 
+## [1.0.1 — Bilingual EN/ES Selector & Clean Build] — 2026-11-25
+- Added **English / Spanish (`Auto` / `English` / `Spanish`) language selector** directly in the top bar of the in-game settings panel (`F8` / Options menu) and in `BepInEx\config\EiyudenKBM.cfg` (`Language`), auto-detecting system language (`Auto`: Spanish on Spanish OS, English everywhere else).
+- Localized the injected Options menu button (`Keyboard & Mouse Controls` / `Controles (Teclado y Ratón)`) and all key/mouse labels.
+- Disabled unused `<AllowUnsafeBlocks>` flag in `.csproj` for a cleaner IL binary (helps reduce antivirus heuristic false positives).
+
 ## [1.0.0 — Completo: Cámara, Diálogos, Combate por Turnos, Mapa e Iconos] — 2026-11-25
 - **Exploración y Cámara (`CameraAndMapPatches`)**: rotación suave de cámara arrastrando con el botón de ratón configurado (por defecto `Clic Derecho`, admite `MouseMiddle`, `Mouse4`, `Mouse5`) con sensibilidad e inversión X/Y ajustables, más giro rápido con `Q`/`E` en campo.
 - **Mapa (`CameraAndMapPatches`)**: arrastrar el mapa con `Clic Izquierdo`, desplazamiento con `WASD` + Flechas y zoom con rueda del ratón o `+`/`-`.

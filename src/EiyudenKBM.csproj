@@ -4,10 +4,10 @@
     <AssemblyName>EiyudenKBM</AssemblyName>
     <RootNamespace>EiyudenKBM</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <Nullable>disable</Nullable>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <BepInExCoreDir>$(MSBuildThisFileDirectory)..\_libs\bepinex_staging\BepInEx\core</BepInExCoreDir>
     <GameInteropDir>C:\Program Files (x86)\Steam\steamapps\common\Eiyuden Chronicle\BepInEx\interop</GameInteropDir>
