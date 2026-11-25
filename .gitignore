@@ -1,0 +1,16 @@
+# Local build, tools, dumps, and third-party/game files (NEVER commit game or BepInEx binaries)
+_dump/
+_downloads/
+_libs/
+_tools/
+dist/
+releases/
+src/bin/
+src/obj/
+*.user
+*.suo
+*.log
+*.lock
+*.safemode
+.vs/
+.vscode/
